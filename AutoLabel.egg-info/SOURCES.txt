@@ -1,0 +1,13 @@
+setup.py
+AutoLabel.egg-info/PKG-INFO
+AutoLabel.egg-info/SOURCES.txt
+AutoLabel.egg-info/dependency_links.txt
+AutoLabel.egg-info/entry_points.txt
+AutoLabel.egg-info/top_level.txt
+deluge_autolabel/__init__.py
+deluge_autolabel/common.py
+deluge_autolabel/core.py
+deluge_autolabel/gtk3ui.py
+deluge_autolabel/webui.py
+deluge_autolabel/data/autolabel.js
+deluge_autolabel/data/config.ui
