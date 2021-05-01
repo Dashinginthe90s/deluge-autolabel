@@ -17,7 +17,8 @@ from deluge.plugins.pluginbase import CorePluginBase
 log = logging.getLogger(__name__)
 
 DEFAULT_PREFS = {
-    'test': 'NiNiNi'
+    'test': 'NiNiNi',
+    'enabled': 'False'
 }
 
 

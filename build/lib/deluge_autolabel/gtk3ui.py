@@ -45,7 +45,9 @@ class Gtk3UI(Gtk3PluginBase):
         log.debug('applying prefs for AutoLabel')
         config = {
             #'test': self.builder.get_object('txt_test').get_text()
-            'test': 'test text'
+            'test': 'test text',
+            #Gets checkbox bool state and converts to string True of False
+            'enabled': str(self.builder.get_object('chk_enable').get_active())
         }
         client.autolabel.set_config(config)
 
@@ -55,9 +57,15 @@ class Gtk3UI(Gtk3PluginBase):
     def cb_get_config(self, config):
         """callback for on show_prefs"""
         #self.builder.get_object('txt_test').set_text(config['test'])
-        pass
+        self.builder.get_object('chk_enable').set_active(bool(config['enabled'].capitalize()))
 
 
 class Handler:
     def on_btn_list_up_clicked(self, button):
         print("Hello World")
+
+    def on_btn_list_add_ckicked(self, button):
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(get_resource('add.ui'))
+        self.builder.show_all()
+        Gtk.main()

@@ -14,7 +14,7 @@ __author_email__ = 'nperkich@gmail.com'
 __version__ = '0.1'
 __url__ = 'https://github.com/Dashinginthe90s/deluge-autolabel'
 __license__ = 'GPLv3'
-__description__ = 'Auto label torrents using rexg'
+__description__ = 'Auto label torrents using regex'
 __long_description__ = """"""
 __pkg_data__ = {'deluge_'+__plugin_name__.lower(): ['data/*']}
 
