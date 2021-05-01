@@ -25,6 +25,7 @@ class Gtk3UI(Gtk3PluginBase):
     def enable(self):
         self.builder = Gtk.Builder()
         self.builder.add_from_file(get_resource('config.ui'))
+        self.builder.connect_signals(Handler())
 
         component.get('Preferences').add_page(
             'AutoLabel', self.builder.get_object('prefs_box'))
@@ -43,7 +44,11 @@ class Gtk3UI(Gtk3PluginBase):
     def on_apply_prefs(self):
         log.debug('applying prefs for AutoLabel')
         config = {
-            'test': self.builder.get_object('txt_test').get_text()
+            #'test': self.builder.get_object('txt_test').get_text()
+            
+            'test': 'test text',
+            #Gets checkbox bool state and converts to string True of False
+            'enabled': str(self.builder.get_object('chk_enable').get_active())
         }
         client.autolabel.set_config(config)
 
@@ -52,4 +57,19 @@ class Gtk3UI(Gtk3PluginBase):
 
     def cb_get_config(self, config):
         """callback for on show_prefs"""
-        self.builder.get_object('txt_test').set_text(config['test'])
+        #self.builder.get_object('txt_test').set_text(config['test'])
+        
+        #Sets the state of the enable checkbox to what is saved in the config
+        #Config value is stored in a string so convert to bool
+        #Capitalize first letter in case someone edited the config manually
+        self.builder.get_object('chk_enable').set_active(bool(config['enabled'].capitalize()))
+
+class Handler:
+    def on_btn_list_up_clicked(self, button):
+        print("Hello World")
+
+    def on_btn_list_add_ckicked(self, button):
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(get_resource('add.ui'))
+        self.builder.show_all()
+        Gtk.main()
