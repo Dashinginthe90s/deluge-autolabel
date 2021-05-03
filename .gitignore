@@ -1,1 +1,3 @@
 deluge_autolabel/data/*.ui~
+deluge_autolabel/data/*.ui#
+deluge_autolabel/__pycache__

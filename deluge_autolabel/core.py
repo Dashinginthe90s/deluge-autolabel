@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_PREFS = {
     'test': 'NiNiNi',
-    'enabled': 'False'
+    'enabled': "False"
 }
 
 

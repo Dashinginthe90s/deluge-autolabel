@@ -12,6 +12,8 @@
       <column type="gchararray"/>
       <!-- column-name enabled -->
       <column type="gboolean"/>
+      <!-- column-name regex -->
+      <column type="gchararray"/>
     </columns>
     <data>
       <row>
@@ -19,18 +21,21 @@
         <col id="1" translatable="yes">tracker</col>
         <col id="2" translatable="yes">animu</col>
         <col id="3">False</col>
+        <col id="4" translatable="yes">test1</col>
       </row>
       <row>
         <col id="0" translatable="yes">Test2</col>
-        <col id="1" translatable="yes"/>
-        <col id="2" translatable="yes"/>
+        <col id="1" translatable="yes">file</col>
+        <col id="2" translatable="yes">pron</col>
         <col id="3">False</col>
+        <col id="4" translatable="yes">tes2</col>
       </row>
       <row>
         <col id="0" translatable="yes">Test3</col>
-        <col id="1" translatable="yes"/>
-        <col id="2" translatable="yes"/>
+        <col id="1" translatable="yes">name</col>
+        <col id="2" translatable="yes">movie</col>
         <col id="3">False</col>
+        <col id="4" translatable="yes">test3</col>
       </row>
     </data>
   </object>
@@ -81,10 +86,13 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="model">store_matches</property>
+                    <property name="headers-clickable">False</property>
                     <property name="reorderable">True</property>
                     <property name="enable-grid-lines">both</property>
                     <child internal-child="selection">
-                      <object class="GtkTreeSelection" id="selection_matches"/>
+                      <object class="GtkTreeSelection" id="selection_matches">
+                        <signal name="changed" handler="on_selection_matches_changed" swapped="no"/>
+                      </object>
                     </child>
                     <child>
                       <object class="GtkTreeViewColumn">
@@ -111,7 +119,7 @@
                     </child>
                     <child>
                       <object class="GtkTreeViewColumn">
-                        <property name="title" translatable="yes">Column</property>
+                        <property name="title" translatable="yes">Label</property>
                         <child>
                           <object class="GtkCellRendererText"/>
                           <attributes>
@@ -148,11 +156,12 @@
                     <child>
                       <object class="GtkButton" id="btn_list_up">
                         <property name="label">gtk-go-up</property>
+                        <property name="name">up</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
-                        <signal name="clicked" handler="on_btn_list_up_clicked" swapped="no"/>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -163,11 +172,12 @@
                     <child>
                       <object class="GtkButton" id="btn_list_down">
                         <property name="label">gtk-go-down</property>
+                        <property name="name">down</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
-                        <signal name="clicked" handler="on_btn_list_down_clicked" swapped="no"/>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -176,11 +186,13 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="btn_list_enable">
+                      <object class="GtkButton" id="btn_list_enable">
                         <property name="label" translatable="yes">Enable</property>
+                        <property name="name">enable</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -191,10 +203,12 @@
                     <child>
                       <object class="GtkButton" id="btn_list_edit">
                         <property name="label">gtk-edit</property>
+                        <property name="name">edit</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -205,10 +219,12 @@
                     <child>
                       <object class="GtkButton" id="btn_list_delete">
                         <property name="label">gtk-delete</property>
+                        <property name="name">delete</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -219,10 +235,12 @@
                     <child>
                       <object class="GtkButton" id="btn_list_new">
                         <property name="label">gtk-add</property>
+                        <property name="name">add</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
+                        <signal name="clicked" handler="on_btn_list_new_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -231,12 +249,14 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="btn_copy">
+                      <object class="GtkButton" id="btn_list_copy">
                         <property name="label">gtk-copy</property>
+                        <property name="name">copy</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
