@@ -11,6 +11,18 @@
     <signal name="inserted-text" handler="on_buffer_changed" swapped="no"/>
   </object>
   <object class="GtkEntryBuffer" id="buffer_test"/>
+  <object class="GtkListStore" id="store_labels">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="store_types">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkDialog" id="dialog_add">
     <property name="can-focus">False</property>
     <property name="modal">True</property>
@@ -32,7 +44,6 @@
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-stock">True</property>
-                <signal name="clicked" handler="on_btn_cancel_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -44,10 +55,10 @@
               <object class="GtkButton" id="btn_save">
                 <property name="label">gtk-save</property>
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-stock">True</property>
-                <signal name="clicked" handler="on_btn_save_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -289,7 +300,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">4</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
@@ -310,17 +321,9 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkListStore" id="store_labels">
-    <columns>
-      <!-- column-name name -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="store_types">
-    <columns>
-      <!-- column-name type -->
-      <column type="gchararray"/>
-    </columns>
+    <action-widgets>
+      <action-widget response="-6">btn_cancel</action-widget>
+      <action-widget response="-5">btn_save</action-widget>
+    </action-widgets>
   </object>
 </interface>

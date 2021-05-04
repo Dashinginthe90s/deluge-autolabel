@@ -66,7 +66,6 @@ class Gtk3UI(Gtk3PluginBase):
         self.builder.add_from_file(get_resource('config.ui'))
         self.builder.connect_signals(
             {
-                'on_btn_list_new_clicked': self.on_btn_list_new_clicked,
                 'on_btn_list_clicked': self.on_btn_list_clicked,
                 'on_selection_matches_changed': self.set_enable
             }
@@ -117,12 +116,22 @@ class Gtk3UI(Gtk3PluginBase):
         
         selection = self.builder.get_object('selection_matches')
         model, selected = selection.get_selected()
+        name = button.get_name()
+        if name == "new":
+            dialog = AddDialog()
+            response = dialog.window.run()
+            if response == Gtk.ResponseType.OK:
+                options = dialog.save_options()
+                if selected is None:
+                    model.prepend(options)
+                else:
+                    model.insert_after(selected, options)
+            return dialog.window.destroy()
         
+        #all buttons below require a row to be selected
         if selected is None:
             return False
 
-        name = button.get_name()
-        
         if name == 'up':
             swap = model.iter_previous(selected)
             if swap is None:
@@ -136,26 +145,28 @@ class Gtk3UI(Gtk3PluginBase):
         if name =='enable':
             state = model.get_value(selected, colEnabled)
             model.set_value(selected, colEnabled, not state)
-            self.set_enable(selection)
+            return self.set_enable(selection)
+        if name =='delete':
+            return model.remove(selected)
         if name == 'edit':
             dialog = AddDialog(selection)
-            dialog.show()
-        if name =='delete':
-            labels = client.label.get_labels()
-            print(labels)
-        if name == "add":
-            pass
+            response = dialog.window.run()
+            if response == Gtk.ResponseType.OK:
+                model.insert_after(selected, dialog.save_options())
+                model.remove(selected)
+            return dialog.window.destroy()
         if name == "copy":
-            pass
-
-
-    def on_btn_list_new_clicked(self, button):
-        dialog = AddDialog()
-        dialog.show()
+            dialog = AddDialog(selection)
+            response = dialog.window.run()
+            if response == Gtk.ResponseType.OK:
+                model.prepend(dialog.save_options())
+            return dialog.window.destroy()
 
 
     def set_enable(self, selection):
         model, selected = selection.get_selected()
+        if selected is None:
+            return False
         state = model.get_value(selected, colEnabled)
         button = self.builder.get_object('btn_list_enable')
         if state:
@@ -166,75 +177,65 @@ class Gtk3UI(Gtk3PluginBase):
 
 
 class AddDialog:
-    def __init__(self, selection=None, operation='Add'):
+    def __init__(self, selection=None):
         if selection is not None:
             self.options = self.get_options(selection)
         else:
             self.options = None
-        self.operation = operation
 
-
-    def get_options(self, selection):
-        model, selected = selection.get_selected()
-        options = {
-            'name': model.get_value(selected, 0),
-            'type': model.get_value(selected, 1),
-            'label': model.get_value(selected, 2),
-            'enabled': model.get_value(selected, 3),
-            'regex': model.get_value(selected, 4)
-        }
-        return options
-
-
-    def show(self):
         self.builder = Gtk.Builder()
         self.builder.add_from_file(get_resource('add.ui'))
         self.builder.connect_signals(
             {
-                'on_btn_cancel_clicked': self.on_btn_cancel_clicked,
-                'on_btn_save_clicked': self.on_btn_save_clicked,
                 'on_dpdn_type_changed': self.checkSave,
                 'on_dpdn_label_changed': self.checkSave,
                 'on_buffer_changed': self.on_buffer_changed
             }
         )
         self.tools = tools(self.builder)
+        self.window = self.builder.get_object('dialog_add')
+        self.window.set_transient_for(component.get('Preferences').pref_dialog)
         self.tools.populate_store('store_types', match_types)
         client.label.get_labels().addCallback(self.cb_get_labels)
+        
 
 
     def cb_get_labels(self, labels):
-        tools(self.builder).populate_store('store_labels', labels)
+        self.tools.populate_store('store_labels', labels)
+        if self.options is not None:
+            o = self.options
+            self.builder.get_object('buffer_name').set_text(o[colName], -1)
+            self.builder.get_object('buffer_regex').set_text(o[colRegex], -1)
+            self.builder.get_object('chk_enable').set_active(o[colEnabled])
+            self.builder.get_object('dpdn_type').set_active_id(o[colType])
+            self.builder.get_object('dpdn_label').set_active_id(o[colLabel])
+        
         #Check if the save button should be enabled
-        self.read_options()
         self.checkSave()
 
-        self.dialog = self.builder.get_object('dialog_add')
-        self.dialog.set_transient_for(component.get('Preferences').pref_dialog)
-        self.dialog.run()
-        #Destroy dialog when X is clicked
-        self.dialog.destroy()
 
-
-    def read_options(self):
-        if self.options is not None:
-            self.builder.get_object('buffer_name').set_text(self.options['name'], -1)
-            self.builder.get_object('buffer_regex').set_text(self.options['regex'], -1)
-            self.builder.get_object('chk_enable').set_active(self.options['enabled'])
-            self.builder.get_object('dpdn_type').set_active_id(self.options['type'])
-            self.builder.get_object('dpdn_label').set_active_id(self.options['label'])
+    def get_options(self, selection):
+        model, selected = selection.get_selected()
+        options = (
+            model.get_value(selected, colName),
+            model.get_value(selected, colType),
+            model.get_value(selected, colLabel),
+            model.get_value(selected, colEnabled),
+            model.get_value(selected, colRegex)
+        )
+        return options
 
 
     def save_options(self):
         t = self.tools
-        options = {
-            'enabled': t.getChk('chk_enable'),
-            '_type': t.getDpdn('dpdn_type'),
-            'label': t.getDpdn('dpdn_label'),
-            'name': t.getIpt('ipt_name'),
-            'expression': t.getIpt('ipt_regex')
-        }
-        print(options)
+        options = (
+            t.getIpt('ipt_name'),
+            t.getDpdn('dpdn_type'),
+            t.getDpdn('dpdn_label'),
+            t.getChk('chk_enable'),
+            t.getIpt('ipt_regex')
+        )
+        return options
 
 
     def checkSave(self, name=None):
@@ -245,19 +246,9 @@ class AddDialog:
             and t.getDpdn('dpdn_type') is not None
             and t.getDpdn('dpdn_label') is not None
         ):
-            t.setSensitive('btn_save', True)
-        else:
-            t.setSensitive('btn_save', False)
+            return t.setSensitive('btn_save', True)
+        return t.setSensitive('btn_save', False)
 
 
     def on_buffer_changed(self, buffer, location, text, len=None):
         self.checkSave(buffer)
-
-
-    def on_btn_cancel_clicked(self, button):
-        self.dialog.destroy()
-
-
-    def on_btn_save_clicked(self, button):
-        self.save_options()
-        self.dialog.destroy()

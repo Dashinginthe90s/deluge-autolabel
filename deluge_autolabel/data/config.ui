@@ -234,13 +234,13 @@
                     </child>
                     <child>
                       <object class="GtkButton" id="btn_list_new">
-                        <property name="label">gtk-add</property>
-                        <property name="name">add</property>
+                        <property name="label">gtk-new</property>
+                        <property name="name">new</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="use-stock">True</property>
-                        <signal name="clicked" handler="on_btn_list_new_clicked" swapped="no"/>
+                        <signal name="clicked" handler="on_btn_list_clicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
